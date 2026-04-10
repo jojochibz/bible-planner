@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sacred Study · Scripture System</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #c9a84c;
+  --gold-light: #e8c97a;
+  --gold-pale: #f5e9c4;
+  --gold-dim: rgba(201,168,76,0.12);
+  --gold-border: rgba(201,168,76,0.25);
+  --ink: #080605;
+  --ink-2: #0f0c09;
+  --ink-3: #161009;
+  --purple: #1e1030;
+  --purple-mid: #2d1a50;
+  --text-warm: #e8dfc8;
+  --text-muted: rgba(201,168,76,0.5);
+  --text-body: #c8bea8;
+  --red-soft: rgba(220,80,80,0.7);
+  --green-soft: rgba(80,180,120,0.8);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  background: var(--ink);
+  color: var(--text-warm);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Background ── */
+.bg {
+  position: fixed; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 10%, rgba(30,16,48,0.85) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 85% 85%, rgba(30,16,48,0.7) 0%, transparent 60%),
+    var(--ink);
+}
+.bg::after {
+  content:'';position:absolute;inset:0;
+  background-image:
+    radial-gradient(1px 1px at 12% 20%, rgba(201,168,76,0.5) 0%,transparent 100%),
+    radial-gradient(1px 1px at 33% 55%, rgba(201,168,76,0.3) 0%,transparent 100%),
+    radial-gradient(1.5px 1.5px at 58% 12%, rgba(201,168,76,0.6) 0%,transparent 100%),
+    radial-gradient(1px 1px at 77% 38%, rgba(201,168,76,0.35) 0%,transparent 100%),
+    radial-gradient(1px 1px at 91% 70%, rgba(201,168,76,0.4) 0%,transparent 100%),
+    radial-gradient(2px 2px at 45% 82%, rgba(201,168,76,0.55) 0%,transparent 100%),
+    radial-gradient(1px 1px at 8% 90%, rgba(201,168,76,0.3) 0%,transparent 100%),
+    radial-gradient(1px 1px at 68% 65%, rgba(201,168,76,0.25) 0%,transparent 100%);
+}
+
+/* ── Layout ── */
+.wrap { position:relative;z-index:1;max-width:780px;margin:0 auto;padding:36px 20px 80px; }
+
+/* ── Animations ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)} }
+@keyframes shimmer { 0%,100%{opacity:0.4}50%{opacity:0.9} }
+@keyframes pulse { 0%,100%{transform:scale(1)}50%{transform:scale(1.04)} }
+.anim { animation: fadeUp 0.7s ease both; }
+.anim-2 { animation: fadeUp 0.7s 0.1s ease both; }
+.anim-3 { animation: fadeUp 0.7s 0.2s ease both; }
+.anim-4 { animation: fadeUp 0.7s 0.3s ease both; }
+
+/* ── Masthead ── */
+.masthead {
+  text-align:center;
+  padding-bottom:28px;
+  margin-bottom:28px;
+  border-bottom:1px solid var(--gold-border);
+  position:relative;
+  animation: fadeUp 0.9s ease both;
+}
+.masthead::after {
+  content:'✦';
+  position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);
+  background:var(--ink);color:var(--gold);padding:0 12px;font-size:0.8rem;
+}
+.eyebrow {
+  font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.45em;
+  color:var(--gold);text-transform:uppercase;margin-bottom:10px;opacity:0.75;
+}
+.masthead h1 {
+  font-family:'Cinzel',serif;font-size:clamp(1.7rem,5vw,2.6rem);
+  font-weight:400;color:#f0e6c8;letter-spacing:0.08em;line-height:1.2;
+}
+.masthead h1 em { color:var(--gold);font-style:normal; }
+.masthead .sub {
+  margin-top:10px;font-family:'EB Garamond',serif;font-style:italic;
+  font-size:1rem;color:var(--text-muted);
+}
+
+/* ── Mode Toggle ── */
+.mode-toggle {
+  display:flex;gap:0;margin-bottom:28px;border:1px solid var(--gold-border);
+  border-radius:2px;overflow:hidden;animation: fadeUp 0.7s 0.15s ease both;
+}
+.mode-btn {
+  flex:1;background:transparent;color:var(--text-muted);
+  border:none;padding:11px 8px;font-family:'Cinzel',serif;
+  font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;
+  cursor:pointer;transition:all 0.3s;border-right:1px solid var(--gold-border);
+  line-height:1.3;
+}
+.mode-btn:last-child{border-right:none;}
+.mode-btn.active {
+  background:var(--gold-dim);color:var(--gold-light);
+  border-bottom:2px solid var(--gold);
+}
+.mode-btn:hover:not(.active){background:rgba(201,168,76,0.05);color:var(--gold);}
+
+/* ── Stats Bar ── */
+.stats-bar {
+  display:flex;align-items:center;justify-content:center;gap:24px;
+  background:linear-gradient(135deg,rgba(30,16,48,0.6),rgba(45,26,80,0.4));
+  border:1px solid var(--gold-border);padding:14px 20px;
+  margin-bottom:20px;border-radius:1px;
+  animation: fadeUp 0.7s 0.2s ease both;
+}
+.stat { text-align:center; }
+.stat-val { font-family:'Cinzel',serif;font-size:1.7rem;color:var(--gold-light);line-height:1; }
+.stat-lbl { font-size:0.6rem;letter-spacing:0.22em;color:var(--text-muted);text-transform:uppercase;margin-top:3px; }
+.stat-div { width:1px;height:32px;background:var(--gold-border); }
+.flame { display:inline-block;animation:pulse 2s ease-in-out infinite; }
+
+/* ── Progress Bar ── */
+.prog-wrap { margin-bottom:28px;animation: fadeUp 0.7s 0.25s ease both; }
+.prog-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:8px; }
+.prog-title { font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.28em;color:var(--text-muted);text-transform:uppercase; }
+.prog-books { font-family:'EB Garamond',serif;font-style:italic;font-size:0.85rem;color:rgba(201,168,76,0.45); }
+.prog-track { height:3px;background:rgba(201,168,76,0.1);position:relative;overflow:visible; }
+.prog-fill {
+  height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));
+  transition:width 0.8s cubic-bezier(0.4,0,0.2,1);position:relative;
+}
+.prog-fill::after {
+  content:'';position:absolute;right:-3px;top:-3px;
+  width:9px;height:9px;background:var(--gold-light);border-radius:50%;
+  box-shadow:0 0 8px rgba(201,168,76,0.6);
+}
+
+/* ── Missed Days Banner ── */
+.missed-banner {
+  background:rgba(180,120,20,0.08);border:1px solid rgba(201,168,76,0.2);
+  border-left:3px solid var(--gold);padding:12px 16px;margin-bottom:20px;
+  display:none;border-radius:1px;animation: fadeUp 0.5s ease both;
+}
+.missed-banner.show { display:flex;align-items:center;gap:12px; }
+.missed-banner .icon { font-size:1.1rem;flex-shrink:0; }
+.missed-banner p { font-family:'EB Garamond',serif;font-style:italic;font-size:0.95rem;color:rgba(201,168,76,0.7);line-height:1.4; }
+.missed-banner p strong { color:var(--gold);font-style:normal; }
+
+/* ── Day Picker ── */
+.day-section { margin-bottom:28px;animation: fadeUp 0.7s 0.3s ease both; }
+.section-label { font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.35em;color:var(--text-muted);text-transform:uppercase;margin-bottom:12px; }
+.day-grid {
+  display:grid;grid-template-columns:repeat(7,1fr);gap:5px;
+}
+.day-chip {
+  aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);
+  cursor:pointer;transition:all 0.25s;border-radius:1px;
+  font-size:0.6rem;font-family:'Cinzel',serif;letter-spacing:0.05em;
+  color:rgba(201,168,76,0.4);position:relative;
+}
+.day-chip:hover { border-color:var(--gold);color:var(--gold);background:var(--gold-dim); }
+.day-chip.today { border-color:var(--gold);color:var(--gold-light);background:var(--gold-dim); }
+.day-chip.completed { background:rgba(80,180,120,0.08);border-color:rgba(80,180,120,0.3);color:rgba(80,180,120,0.6); }
+.day-chip.completed::after { content:'✓';position:absolute;top:2px;right:4px;font-size:0.5rem;color:rgba(80,180,120,0.7); }
+.day-chip.missed { border-color:rgba(201,168,76,0.08); }
+.day-chip.selected { border-color:var(--gold-light);background:rgba(201,168,76,0.18);color:var(--gold-pale);box-shadow:0 0 12px rgba(201,168,76,0.15); }
+.day-num { font-size:0.85rem;line-height:1; }
+.day-abbr { font-size:0.45rem;letter-spacing:0.1em;margin-top:2px; }
+
+/* ── Reading Card ── */
+.reading-card {
+  background:linear-gradient(135deg,rgba(201,168,76,0.07),rgba(201,168,76,0.02));
+  border:1px solid var(--gold-border);padding:20px 22px;
+  margin-bottom:24px;position:relative;border-radius:1px;
+  animation: fadeUp 0.7s 0.35s ease both;
+}
+.reading-card::before { content:'';position:absolute;top:0;left:20px;right:20px;height:1px;background:linear-gradient(90deg,transparent,var(--gold-border),transparent); }
+.reading-top { display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px; }
+.reading-meta .tag { font-family:'Cinzel',serif;font-size:0.57rem;letter-spacing:0.35em;color:var(--gold);opacity:0.7;text-transform:uppercase;margin-bottom:6px; }
+.reading-ref { font-family:'Cinzel',serif;font-size:1.25rem;font-weight:500;color:var(--gold-pale);letter-spacing:0.04em; }
+.reading-theme { font-family:'EB Garamond',serif;font-style:italic;font-size:0.95rem;color:var(--text-muted);margin-top:4px; }
+.reading-desc { font-family:'EB Garamond',serif;font-size:1.05rem;color:var(--text-body);line-height:1.65;margin-bottom:14px;border-top:1px solid rgba(201,168,76,0.1);padding-top:12px; }
+.reading-links { display:flex;gap:10px;flex-wrap:wrap; }
+.link-btn {
+  display:inline-flex;align-items:center;gap:7px;background:transparent;
+  color:var(--gold);border:1px solid var(--gold-border);padding:8px 16px;
+  font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.2em;
+  text-transform:uppercase;text-decoration:none;cursor:pointer;
+  transition:all 0.3s;white-space:nowrap;border-radius:1px;
+}
+.link-btn:hover { background:var(--gold-dim);border-color:var(--gold);color:var(--gold-light); }
+.link-btn svg { width:11px;height:11px;fill:currentColor;flex-shrink:0; }
+.link-btn.secondary { opacity:0.6; }
+.link-btn.secondary:hover { opacity:1; }
+
+/* ── Thematic Cards ── */
+.thematic-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px;animation: fadeUp 0.7s 0.3s ease both; }
+.theme-card {
+  background:rgba(10,8,6,0.6);border:1px solid rgba(201,168,76,0.18);
+  padding:16px;cursor:pointer;transition:all 0.3s;border-radius:1px;position:relative;overflow:hidden;
+}
+.theme-card::before { content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold-border),transparent);transition:opacity 0.3s; }
+.theme-card:hover { border-color:var(--gold);transform:translateY(-2px); }
+.theme-card.active-theme { border-color:var(--gold);background:var(--gold-dim); }
+.theme-emoji { font-size:1.4rem;margin-bottom:8px; }
+.theme-title { font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.18em;color:var(--gold-light);text-transform:uppercase;margin-bottom:4px; }
+.theme-books { font-family:'EB Garamond',serif;font-style:italic;font-size:0.85rem;color:var(--text-muted); }
+.theme-days { font-size:0.62rem;letter-spacing:0.15em;color:rgba(201,168,76,0.35);margin-top:6px;font-family:'Cinzel',serif;text-transform:uppercase; }
+
+/* ── Study Sections ── */
+.study-sections { animation: fadeUp 0.7s 0.4s ease both; }
+.card {
+  background:rgba(8,6,5,0.7);border:1px solid rgba(201,168,76,0.16);
+  padding:22px 22px 18px;margin-bottom:18px;position:relative;border-radius:1px;
+  transition:border-color 0.3s;
+}
+.card:hover { border-color:rgba(201,168,76,0.3); }
+.card::before { content:'';position:absolute;top:0;left:20px;right:20px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.2),transparent); }
+.card-header { display:flex;align-items:center;gap:10px;margin-bottom:16px; }
+.card-icon { font-size:1rem; }
+.card-title { font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase; }
+.field { margin-bottom:14px; }
+.field:last-child { margin-bottom:0; }
+.field label { display:block;font-family:'EB Garamond',serif;font-style:italic;font-size:0.95rem;color:rgba(201,168,76,0.5);margin-bottom:7px;letter-spacing:0.02em; }
+textarea {
+  width:100%;min-height:76px;background:rgba(201,168,76,0.03);color:var(--text-warm);
+  border:1px solid rgba(201,168,76,0.14);border-radius:1px;padding:11px 13px;
+  font-family:'Cormorant Garamond',Georgia,serif;font-size:1rem;line-height:1.65;
+  resize:vertical;transition:border-color 0.25s,background 0.25s;outline:none;
+}
+textarea:focus { border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.06); }
+textarea::placeholder { color:rgba(201,168,76,0.18);font-style:italic; }
+
+/* ── AI Reflection ── */
+.ai-card { border-color:rgba(201,168,76,0.22); }
+.ai-prompt-row { display:flex;gap:10px;align-items:flex-end;margin-bottom:12px; }
+.ai-prompt-row textarea { min-height:60px;flex:1;margin:0; }
+.ask-btn {
+  background:linear-gradient(135deg,var(--purple),var(--purple-mid));
+  color:var(--gold-light);border:1px solid var(--gold-border);padding:10px 16px;
+  font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;
+  cursor:pointer;transition:all 0.3s;white-space:nowrap;border-radius:1px;align-self:stretch;
+  display:flex;align-items:center;gap:6px;
+}
+.ask-btn:hover { border-color:var(--gold);box-shadow:0 0 16px rgba(201,168,76,0.12); }
+.ask-btn:disabled { opacity:0.5;cursor:not-allowed; }
+.ai-suggestions { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px; }
+.suggestion {
+  background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.15);
+  padding:5px 12px;font-family:'EB Garamond',serif;font-style:italic;
+  font-size:0.82rem;color:rgba(201,168,76,0.55);cursor:pointer;border-radius:1px;
+  transition:all 0.25s;
+}
+.suggestion:hover { border-color:var(--gold);color:var(--gold);background:var(--gold-dim); }
+.ai-response {
+  background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15);
+  border-left:3px solid var(--gold);padding:14px 16px;
+  font-family:'EB Garamond',serif;font-size:1.05rem;line-height:1.75;
+  color:var(--text-body);border-radius:0 1px 1px 0;display:none;
+}
+.ai-response.show { display:block;animation:fadeUp 0.5s ease both; }
+.ai-thinking { display:none;align-items:center;gap:10px;padding:12px 0;color:var(--text-muted);font-family:'EB Garamond',serif;font-style:italic;font-size:0.95rem; }
+.ai-thinking.show { display:flex; }
+.dots span {
+  display:inline-block;width:4px;height:4px;background:var(--gold);
+  border-radius:50%;margin:0 2px;animation:shimmer 1.2s infinite;
+}
+.dots span:nth-child(2) { animation-delay:0.2s; }
+.dots span:nth-child(3) { animation-delay:0.4s; }
+
+/* ── Bottom Actions ── */
+.actions { display:flex;gap:12px;flex-wrap:wrap;margin-top:32px;animation: fadeUp 0.7s 0.45s ease both; }
+.complete-btn {
+  flex:1;min-width:200px;
+  background:linear-gradient(135deg,rgba(30,16,48,0.9),rgba(45,26,80,0.8));
+  color:var(--gold-light);border:1px solid var(--gold-border);
+  padding:14px 24px;font-family:'Cinzel',serif;font-size:0.65rem;
+  letter-spacing:0.28em;text-transform:uppercase;cursor:pointer;
+  transition:all 0.35s;border-radius:1px;position:relative;overflow:hidden;
+}
+.complete-btn::before {
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(201,168,76,0.1),rgba(201,168,76,0.04));
+  opacity:0;transition:opacity 0.35s;
+}
+.complete-btn:hover::before { opacity:1; }
+.complete-btn:hover { border-color:var(--gold);box-shadow:0 0 24px rgba(201,168,76,0.12); }
+.complete-btn.done { border-color:rgba(80,180,120,0.5);color:rgba(120,220,160,0.9); }
+
+.export-btn {
+  background:transparent;color:var(--text-muted);border:1px solid rgba(201,168,76,0.18);
+  padding:14px 20px;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.22em;
+  text-transform:uppercase;cursor:pointer;transition:all 0.3s;border-radius:1px;
+  display:flex;align-items:center;gap:8px;
+}
+.export-btn:hover { border-color:var(--gold);color:var(--gold); }
+.export-btn svg { width:13px;height:13px;fill:currentColor; }
+
+/* ── Export Modal ── */
+.modal-overlay {
+  position:fixed;inset:0;background:rgba(8,6,5,0.88);z-index:100;
+  display:none;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.show { display:flex; }
+.modal {
+  background:var(--ink-3);border:1px solid var(--gold-border);
+  max-width:620px;width:100%;max-height:80vh;overflow-y:auto;
+  border-radius:2px;animation:fadeUp 0.4s ease both;position:relative;
+}
+.modal-header {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 22px;border-bottom:1px solid var(--gold-border);
+}
+.modal-title { font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.3em;color:var(--gold);text-transform:uppercase; }
+.modal-close { background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1.2rem;padding:4px;transition:color 0.2s; }
+.modal-close:hover { color:var(--gold); }
+.modal-body { padding:22px; }
+.export-preview {
+  background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.12);
+  padding:16px;font-family:'EB Garamond',serif;font-size:0.95rem;
+  line-height:1.8;color:var(--text-body);white-space:pre-wrap;
+  max-height:320px;overflow-y:auto;border-radius:1px;margin-bottom:16px;
+}
+.modal-actions { display:flex;gap:10px;flex-wrap:wrap; }
+.modal-btn {
+  flex:1;min-width:140px;background:transparent;border:1px solid var(--gold-border);
+  color:var(--gold);padding:10px 16px;font-family:'Cinzel',serif;
+  font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;
+  cursor:pointer;transition:all 0.3s;border-radius:1px;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.modal-btn:hover { background:var(--gold-dim);border-color:var(--gold);color:var(--gold-light); }
+.modal-btn svg { width:13px;height:13px;fill:currentColor; }
+
+/* ── Toast ── */
+.toast {
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(60px);
+  background:var(--purple-mid);border:1px solid var(--gold-border);
+  color:var(--gold-light);padding:11px 26px;
+  font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;
+  opacity:0;transition:all 0.45s cubic-bezier(0.4,0,0.2,1);z-index:200;pointer-events:none;
+  border-radius:1px;
+}
+.toast.show { opacity:1;transform:translateX(-50%) translateY(0); }
+
+/* ── Corners ── */
+.corners { position:relative; }
+.corners::after, .corners::before { display:none; }
+.c { position:absolute;width:10px;height:10px;border-color:rgba(201,168,76,0.25);border-style:solid; }
+.c.tl{top:8px;left:8px;border-width:1px 0 0 1px}
+.c.tr{top:8px;right:8px;border-width:1px 1px 0 0}
+.c.bl{bottom:8px;left:8px;border-width:0 0 1px 1px}
+.c.br{bottom:8px;right:8px;border-width:0 1px 1px 0}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:rgba(201,168,76,0.05)}
+::-webkit-scrollbar-thumb{background:rgba(201,168,76,0.2);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:rgba(201,168,76,0.35)}
+
+@media(max-width:500px){
+  .stats-bar{gap:14px;padding:12px 12px;}
+  .stat-val{font-size:1.4rem;}
+  .day-grid{grid-template-columns:repeat(7,1fr);gap:3px;}
+  .thematic-grid{grid-template-columns:1fr 1fr;}
+  .actions{flex-direction:column;}
+  .reading-top{flex-direction:column;gap:10px;}
+}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<div class="wrap">
+
+  <!-- Masthead -->
+  <header class="masthead">
+    <div class="eyebrow">Sacred Study System</div>
+    <h1>Scripture <em>Planner</em></h1>
+    <div class="sub" id="dateDisplay"></div>
+  </header>
+
+  <!-- Mode Toggle -->
+  <div class="mode-toggle anim">
+    <button class="mode-btn active" onclick="setMode('chronological')" id="btn-chrono">📖 Chronological</button>
+    <button class="mode-btn" onclick="setMode('thematic')" id="btn-thematic">🌿 Thematic</button>
+    <button class="mode-btn" onclick="setMode('wisdom')" id="btn-wisdom">💡 Wisdom Daily</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar anim-2">
+    <div class="stat">
+      <div class="stat-val"><span class="flame">🔥</span> <span id="streakVal">0</span></div>
+      <div class="stat-lbl">Day Streak</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat">
+      <div class="stat-val" id="completedVal">0</div>
+      <div class="stat-lbl">Completed</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat">
+      <div class="stat-val" id="booksVal">0</div>
+      <div class="stat-lbl">Books Read</div>
+    </div>
+    <div class="stat-div"></div>
+    <div class="stat">
+      <div class="stat-val" id="pctVal">0%</div>
+      <div class="stat-lbl">Annual Goal</div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="prog-wrap anim-3">
+    <div class="prog-header">
+      <span class="prog-title">Bible Progress</span>
+      <span class="prog-books" id="progressBooks">Genesis — Revelation</span>
+    </div>
+    <div class="prog-track">
+      <div class="prog-fill" id="progFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Missed days banner -->
+  <div class="missed-banner" id="missedBanner">
+    <span class="icon">🌙</span>
+    <p id="missedText">You missed a few days. <strong>No shame here.</strong> Pick up where you left off — grace is the whole point.</p>
+  </div>
+
+  <!-- ════ CHRONOLOGICAL MODE ════ -->
+  <div id="chrono-panel">
+
+    <!-- Week day picker -->
+    <div class="day-section anim-4">
+      <div class="section-label">This Week — Select a Day</div>
+      <div class="day-grid" id="dayGrid"></div>
+    </div>
+
+    <!-- Reading card -->
+    <div class="reading-card corners" id="readingCard">
+      <div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div>
+      <div class="reading-top">
+        <div class="reading-meta">
+          <div class="tag">Today's Reading · <span id="readingDay">Day 1</span></div>
+          <div class="reading-ref" id="readingRef">Genesis 1–3</div>
+          <div class="reading-theme" id="readingTheme">Creation & The Fall</div>
+        </div>
+      </div>
+      <div class="reading-desc" id="readingDesc"></div>
+      <div class="reading-links">
+        <a class="link-btn" id="jwLink" href="#" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3zm-1 2H5a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-8h-2v8H5V7h8V5z"/></svg>
+          Open in JW Library
+        </a>
+        <a class="link-btn secondary" id="bibleGatewayLink" href="#" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+          Bible Gateway
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════ THEMATIC MODE ════ -->
+  <div id="thematic-panel" style="display:none">
+    <div class="section-label anim" style="margin-bottom:12px;">Choose a Theme — Follow Your Heart Today</div>
+    <div class="thematic-grid" id="themeGrid"></div>
+    <div class="reading-card corners" id="themeReadingCard" style="display:none">
+      <div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div>
+      <div class="reading-top">
+        <div class="reading-meta">
+          <div class="tag">Thematic Reading · <span id="themeDay">Reading 1</span></div>
+          <div class="reading-ref" id="themeRef">—</div>
+          <div class="reading-theme" id="themeSubtitle">—</div>
+        </div>
+      </div>
+      <div class="reading-desc" id="themeDesc"></div>
+      <div class="reading-links">
+        <a class="link-btn" id="themeJwLink" href="#" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3zm-1 2H5a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-8h-2v8H5V7h8V5z"/></svg>
+          Open in JW Library
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ WISDOM MODE ════ -->
+  <div id="wisdom-panel" style="display:none">
+    <div class="reading-card corners anim">
+      <div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div>
+      <div class="reading-top">
+        <div class="reading-meta">
+          <div class="tag">Wisdom Reading · Daily Proverb + Psalm</div>
+          <div class="reading-ref" id="wisdomRef">—</div>
+          <div class="reading-theme" id="wisdomTheme">—</div>
+        </div>
+      </div>
+      <div class="reading-desc" id="wisdomDesc"></div>
+      <div class="reading-links">
+        <a class="link-btn" id="wisdomJwLink" href="#" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42L17.59 5H14V3zm-1 2H5a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2v-8h-2v8H5V7h8V5z"/></svg>
+          Open in JW Library
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ STUDY SECTIONS ════ -->
+  <div class="study-sections">
+
+    <!-- Understand -->
+    <div class="card corners" style="position:relative">
+      <div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div>
+      <div class="card-header">
+        <span class="card-icon">📖</span>
+        <span class="card-title">Understand</span>
+      </div>
+      <div class="field">
+        <label>Who are the key figures?</label>
+        <textarea id="f-characters" placeholder="Main characters, their roles, their motivations…"></textarea>
+      </div>
+      <div class="field">
+        <label>What is happening and why?</label>
+        <textarea id="f-events" placeholder="Summarise the passage in your own words…"></textarea>
+      </div>
+    </div>
+
+    <!-- Discernment -->
+    <div class="card corners" style="position:relative">
+      <div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div>
+      <div class="card-header">
+        <span class="card-icon">🔍</span>
+        <span class="card-title">Discernment</span>
+      </div>
+      <div class="field">
+        <label>What deeper meaning do I see?</label>
+        <textarea id="f-deeper" placeholder="Themes, spiritual principles, typology…"></textarea>
+      </div>
+      <div class="field">
+        <label>What is not immediately obvious?</label>
+        <textarea id="f-hidden" placeholder="What requires closer examination?"></textarea>
+      </div>
+    </div>
+
+    <!-- AI Reflection -->
+    <div class="card ai-card corners" style="position:relative">
+      <div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div>
+      <div class="card-header">
+        <span class="card-icon">✨</span>
+        <span class="card-title">AI Reflection</span>
+      </div>
+      <div class="ai-suggestions">
+        <span class="suggestion" onclick="prefillQ(this)">What is the spiritual principle here?</span>
+        <span class="suggestion" onclick="prefillQ(this)">How does this connect to Jesus?</span>
+        <span class="suggestion" onclick="prefillQ(this)">What can I learn from this character?</span>
+        <span class="suggestion" onclick="prefillQ(this)">How does this passage apply to modern life?</span>
+      </div>
+      <div class="ai-prompt-row">
+        <textarea id="aiQuestion" placeholder="Ask anything about today's passage…" style="min-height:60px;"></textarea>
+        <button class="ask-btn" id="askBtn" onclick="askAI()">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          Ask
+        </button>
+      </div>
+      <div class="ai-thinking" id="aiThinking">
+        <span>Reflecting</span>
+        <span class="dots"><span></span><span></span><span></span></span>
+      </div>
+      <div class="ai-response" id="aiResponse"></div>
+    </div>
+
+    <!-- Personal Notes -->
+    <div class="card corners" style="position:relative">
+      <div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div>
+      <div class="card-header">
+        <span class="card-icon">✍️</span>
+        <span class="card-title">Personal Notes</span>
+      </div>
+      <div class="field">
+        <textarea id="f-notes" style="min-height:110px;" placeholder="Write freely — questions, impressions, prayers, anything…"></textarea>
+      </div>
+    </div>
+
+    <!-- Application -->
+    <div class="card corners" style="position:relative">
+      <div class="c tl"></div><div class="c tr"></div><div class="c bl"></div><div class="c br"></div>
+      <div class="card-header">
+        <span class="card-icon">🔥</span>
+        <span class="card-title">Application</span>
+      </div>
+      <div class="field">
+        <label>One thing I will put into practice today</label>
+        <textarea id="f-apply" placeholder="Concrete, specific, actionable…"></textarea>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Actions -->
+  <div class="actions">
+    <button class="complete-btn" id="completeBtn" onclick="completeSession()">
+      ✦ &nbsp; Mark Session Complete &nbsp; ✦
+    </button>
+    <button class="export-btn" onclick="openExport()">
+      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      Export Journal
+    </button>
+  </div>
+
+</div>
+
+<!-- Export Modal -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Export Today's Journal</span>
+      <button class="modal-close" onclick="closeExport()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="export-preview" id="exportPreview"></div>
+      <div class="modal-actions">
+        <button class="modal-btn" onclick="copyExport()">
+          <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+          Copy All
+        </button>
+        <button class="modal-btn" onclick="downloadJournal()">
+          <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Download .txt
+        </button>
+        <button class="modal-btn" onclick="downloadJournalHtml()">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          Download Journal Page
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════════
+
+const CHRONO_SCHEDULE = [
+  // Week 1 — Creation & Patriarchs
+  { day:1, ref:"Genesis 1–3", theme:"Creation & The Fall", desc:"God creates the heavens and the earth, forms humanity in His image, and the first act of disobedience reshapes human history. Notice the pattern: creation, purpose, warning, consequence.", books:["Genesis"], docid:"1001070001" },
+  { day:2, ref:"Genesis 4–7", theme:"Cain, Abel & Noah", desc:"The ripple effects of sin — jealousy, murder, and a world that drifted far from its Maker. Yet grace appears: one man found favour.", books:["Genesis"], docid:"1001070001" },
+  { day:3, ref:"Genesis 8–11", theme:"The Flood & Babel", desc:"Waters recede. A covenant in the clouds. Then human pride assembles again at Babel. God scatters — and through scattering, fills the earth.", books:["Genesis"], docid:"1001070001" },
+  { day:4, ref:"Genesis 12–15", theme:"The Call of Abraham", desc:"A childless man is called to father nations. Faith, not sight. Watch how Abram's obedience reshapes the entire biblical story.", books:["Genesis"], docid:"1001070001" },
+  { day:5, ref:"Genesis 16–19", theme:"Hagar, Ishmael & Sodom", desc:"Two children. Two mothers. The complexity of human plans colliding with divine purpose. And a city that could not find ten righteous souls.", books:["Genesis"], docid:"1001070001" },
+  { day:6, ref:"Genesis 20–24", theme:"Isaac & The Test", desc:"The greatest test of faith: a father, a son, a mountain. Then a bride found from far away — a portrait of something far greater.", books:["Genesis"], docid:"1001070001" },
+  { day:7, ref:"Genesis 25–28", theme:"Jacob & Esau", desc:"Two brothers, one birthright. The pattern of the younger chosen over the elder runs through scripture. A stairway to heaven and a promise renewed.", books:["Genesis"], docid:"1001070001" },
+  // Week 2
+  { day:8, ref:"Genesis 29–32", theme:"Jacob's Long Road", desc:"Love, labour, deception — Jacob sows what he once reaped. Wrestling with God through the night changes not just his hip, but his name.", books:["Genesis"], docid:"1001070001" },
+  { day:9, ref:"Genesis 37–41", theme:"Joseph — The Dreamer", desc:"Sold by his brothers. Imprisoned unjustly. Yet providence weaves through every injustice. Joseph rises because God is with him.", books:["Genesis"], docid:"1001070001" },
+  { day:10, ref:"Genesis 42–45", theme:"Reunion & Forgiveness", desc:"The moment of revelation. Tears and forgiveness. Joseph's declaration: 'You meant it for harm — God meant it for good.' A model of grace.", books:["Genesis"], docid:"1001070001" },
+  { day:11, ref:"Exodus 1–4", theme:"Moses — The Burning Bush", desc:"A nation enslaved. An unlikely shepherd. A bush that burns without being consumed. The Name above all names declared from fire.", books:["Exodus"], docid:"1001070002" },
+  { day:12, ref:"Exodus 5–12", theme:"The Plagues of Egypt", desc:"Ten acts of divine power, each dismantling an Egyptian deity. Pharaoh's hardened heart is both chilling and instructive.", books:["Exodus"], docid:"1001070002" },
+  { day:13, ref:"Exodus 13–17", theme:"The Exodus & Wilderness", desc:"A sea parts. A pillar leads. Manna falls. Yet complaints rise almost immediately. What does this reveal about human nature — and patience?", books:["Exodus"], docid:"1001070002" },
+  { day:14, ref:"Exodus 19–20", theme:"Mount Sinai & The Law", desc:"A holy mountain, thick cloud, and thunder. The Law given not to earn favour but to shape a people. How does grace and law coexist?", books:["Exodus"], docid:"1001070002" },
+];
+
+const THEMATIC_TRACKS = [
+  {
+    id:"friendship", emoji:"🤝", title:"Friendship & Loyalty",
+    books:"1 Samuel, Ruth",
+    days:"7 readings",
+    readings:[
+      { ref:"1 Samuel 18:1–4; 19:1–7", subtitle:"A covenant of souls", desc:"Jonathan strips his own robe and gives it to David — a radical act of covenant friendship. Notice how true loyalty costs something.", docid:"1001070009", par:"1" },
+      { ref:"1 Samuel 20:1–42", subtitle:"A friend who risks everything", desc:"Jonathan risks his father's fury to protect David. Observe the code word, the arrow, and the farewell that breaks both their hearts.", docid:"1001070009", par:"1" },
+      { ref:"Ruth 1:1–18", subtitle:"Where you go, I will go", desc:"Ruth's loyalty to Naomi is one of scripture's most beautiful declarations. She chooses relationship over security.", docid:"1001070008", par:"1" },
+      { ref:"Ruth 2–4", subtitle:"Redemption through kindness", desc:"Boaz sees Ruth and acts with generosity beyond obligation. Lovingkindness (hesed) as the engine of this story.", docid:"1001070008", par:"1" },
+    ]
+  },
+  {
+    id:"temptation", emoji:"🌊", title:"Temptation & Integrity",
+    books:"Genesis, Proverbs, Job",
+    days:"6 readings",
+    readings:[
+      { ref:"Genesis 39:1–23", subtitle:"Joseph flees — literally", desc:"Potiphar's wife. Persistent pressure. Joseph runs and loses his coat — and gains everything. What gives him the strength to resist?", docid:"1001070001", par:"1" },
+      { ref:"Job 1–2", subtitle:"When everything is stripped away", desc:"Satan's accusation: 'Does Job serve God for nothing?' The test is not about suffering — it's about the purity of devotion.", docid:"1001070018", par:"1" },
+      { ref:"Proverbs 7", subtitle:"The anatomy of temptation", desc:"A vivid, almost cinematic description of how temptation works: flattery, darkness, the street corner, the slow approach. Read it carefully.", docid:"1001070020", par:"1" },
+    ]
+  },
+  {
+    id:"prayer", emoji:"🙏", title:"Prayer & Intimacy with God",
+    books:"Nehemiah, Psalms, Daniel",
+    days:"8 readings",
+    readings:[
+      { ref:"Nehemiah 1", subtitle:"A prayer that changes history", desc:"Nehemiah hears bad news and immediately prays. Study his structure: adoration, confession, petition. A masterclass in intercession.", docid:"1001070016", par:"1" },
+      { ref:"Psalm 22", subtitle:"The cry of abandonment", desc:"'My God, my God, why have you forsaken me?' — words Jesus quoted from the cross. Both a lament and a declaration of trust.", docid:"1001070019", par:"1" },
+      { ref:"Psalm 23", subtitle:"The Shepherd Psalm", desc:"Six verses. An entire theology of trust. Walk through each line slowly. What does it mean to lack nothing?", docid:"1001070019", par:"1" },
+      { ref:"Daniel 6:10–23", subtitle:"Prayer as defiance", desc:"Daniel prays with the window open, fully aware of the law. His prayer is not private — it is public faithfulness.", docid:"1001070027", par:"1" },
+    ]
+  },
+  {
+    id:"courage", emoji:"⚔️", title:"Courage Against the Odds",
+    books:"Joshua, Esther, Daniel",
+    days:"6 readings",
+    readings:[
+      { ref:"Joshua 1", subtitle:"Be strong and courageous", desc:"God's command to Joshua: four times He says 'be strong.' Why does courage need to be commanded? What does this reveal about fear?", docid:"1001070006", par:"1" },
+      { ref:"Esther 3–5", subtitle:"For such a time as this", desc:"Mordecai's challenge pierces: 'Who knows whether you have come to the kingdom for such a time as this?' What is your Esther moment?", docid:"1001070017", par:"1" },
+      { ref:"Daniel 3", subtitle:"Even if He does not", desc:"'Our God whom we serve is able to deliver us. But even if He does not…' — one of scripture's most stunning declarations of faith.", docid:"1001070027", par:"1" },
+    ]
+  },
+  {
+    id:"wilderness", emoji:"🏜️", title:"Wilderness & Waiting",
+    books:"Numbers, Psalms, Isaiah",
+    days:"7 readings",
+    readings:[
+      { ref:"Numbers 13–14", subtitle:"The report that cost a generation", desc:"Twelve spies. Two faiths. The majority report wins and costs Israel forty years. What 'giants' am I allowing to define my report?", docid:"1001070004", par:"1" },
+      { ref:"Psalm 46", subtitle:"God in the storm", desc:"'Be still and know that I am God.' Written in a time of national crisis. What does stillness require — and what does it produce?", docid:"1001070019", par:"1" },
+      { ref:"Isaiah 40:28–31", subtitle:"Renewed like eagles", desc:"The famous passage on waiting. In Hebrew, 'wait' (qavah) means to twist together like rope — strength through intertwining with God.", docid:"1001070023", par:"1" },
+    ]
+  },
+  {
+    id:"identity", emoji:"👁️", title:"Who God Says You Are",
+    books:"Psalms, Isaiah, Jeremiah",
+    days:"5 readings",
+    readings:[
+      { ref:"Psalm 139", subtitle:"Known before being formed", desc:"You are not anonymous to God. Every verse of Psalm 139 confronts the lie of insignificance. Read it as a personal letter.", docid:"1001070019", par:"1" },
+      { ref:"Isaiah 43:1–7", subtitle:"Called by name", desc:"'Do not fear, for I have redeemed you; I have called you by name, you are mine.' Identity rooted in belonging, not achievement.", docid:"1001070023", par:"1" },
+      { ref:"Jeremiah 1:4–10", subtitle:"Before you were born", desc:"Jeremiah's calling predates his existence. His protest — 'I do not know how to speak' — is met with God's touch and God's words.", docid:"1001070024", par:"1" },
+    ]
+  },
+];
+
+const WISDOM_SCHEDULE = [
+  { ref:"Proverbs 1 + Psalm 1", theme:"The Fear of the Lord", desc:"Two poems about two paths. Wisdom cries in the street. Blessed is the one who delights in instruction — what does delight in wisdom look like for you?", docid:"1001070020", par:"1" },
+  { ref:"Proverbs 2 + Psalm 8", theme:"Searching Like Silver", desc:"Wisdom must be sought. It doesn't arrive passively. Paired with the vastness of creation — you are simultaneously small and crowned with glory.", docid:"1001070020", par:"1" },
+  { ref:"Proverbs 3:1–12 + Psalm 16", theme:"Trust With All Your Heart", desc:"'Lean not on your own understanding.' Proverbs 3:5 is a life verse for millions. What does non-leaning actually look like day to day?", docid:"1001070020", par:"1" },
+  { ref:"Proverbs 4 + Psalm 19", theme:"Guard Your Heart", desc:"The heart as the wellspring of life. Paired with the heavens declaring God's glory — wisdom flows from both the cosmos and the commandment.", docid:"1001070020", par:"1" },
+  { ref:"Proverbs 8 + Psalm 27", theme:"Wisdom as a Person", desc:"Wisdom speaks in first person — 'I was there before creation.' This passage echoes powerfully with John 1. Who is the personification of wisdom?", docid:"1001070020", par:"1" },
+  { ref:"Proverbs 11 + Psalm 37", theme:"Generosity & Justice", desc:"The righteous flourish while the wicked wither — both chapters. But this is about long-view living, not immediate reward. Delight yourself in God.", docid:"1001070020", par:"1" },
+  { ref:"Proverbs 31:10–31 + Psalm 128", theme:"Faithful Lives", desc:"The capable woman of Proverbs 31 is not about gender roles — she's an acrostic poem about wisdom embodied. Each verse begins with a Hebrew letter.", docid:"1001070020", par:"1" },
+];
+
+// ══════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════
+
+let state = JSON.parse(localStorage.getItem('sacredStudy_v2') || '{}');
+state.streak = state.streak || 0;
+state.sessions = state.sessions || 0;
+state.completedDays = state.completedDays || {};
+state.lastDate = state.lastDate || null;
+state.booksRead = state.booksRead || [];
+state.selectedDay = state.selectedDay || null;
+state.mode = state.mode || 'chronological';
+state.selectedTheme = state.selectedTheme || null;
+state.themeDay = state.themeDay || 0;
+
+let currentMode = state.mode || 'chronological';
+let currentReading = null;
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+
+function init() {
+  const now = new Date();
+  document.getElementById('dateDisplay').textContent =
+    now.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  checkMissedDays();
+  buildDayGrid();
+  renderStats();
+  setMode(currentMode, true);
+
+  // Load saved notes
+  ['characters','events','deeper','hidden','notes','apply'].forEach(k => {
+    const el = document.getElementById('f-' + k);
+    if(el) el.value = state['note_' + k] || '';
+  });
+
+  // Auto-save notes
+  ['characters','events','deeper','hidden','notes','apply'].forEach(k => {
+    const el = document.getElementById('f-' + k);
+    if(el) el.addEventListener('input', () => {
+      state['note_' + k] = el.value;
+      saveState();
+    });
+  });
+
+  // Check complete for today
+  const todayKey = now.toDateString();
+  if(state.completedDays[todayKey]) {
+    const btn = document.getElementById('completeBtn');
+    btn.classList.add('done');
+    btn.textContent = '✓  Completed Today';
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  DAY GRID
+// ══════════════════════════════════════════════════
+
+function buildDayGrid() {
+  const grid = document.getElementById('dayGrid');
+  grid.innerHTML = '';
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+
+  const abbrs = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  for(let i = 0; i < 14; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    const key = d.toDateString();
+    const isToday = key === now.toDateString();
+    const isFuture = d > now;
+    const isCompleted = !!state.completedDays[key];
+    const dayNum = ((i + state.startDayOffset) || i) + 1;
+
+    const chip = document.createElement('div');
+    chip.className = 'day-chip';
+    if(isToday) chip.classList.add('today');
+    if(isCompleted) chip.classList.add('completed');
+    if(isFuture) chip.style.opacity = '0.4';
+
+    chip.innerHTML = `<span class="day-num">${d.getDate()}</span><span class="day-abbr">${abbrs[i % 7]}</span>`;
+
+    const dayIndex = i;
+    chip.onclick = () => {
+      document.querySelectorAll('.day-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      state.selectedDay = dayIndex;
+      loadChronoReading(dayIndex);
+    };
+
+    if(isToday && state.selectedDay === null) {
+      setTimeout(() => {
+        chip.classList.add('selected');
+        state.selectedDay = i;
+        loadChronoReading(i);
+      }, 100);
+    }
+
+    grid.appendChild(chip);
+  }
+
+  // Restore previously selected
+  if(state.selectedDay !== null) {
+    const chips = grid.querySelectorAll('.day-chip');
+    if(chips[state.selectedDay]) {
+      chips[state.selectedDay].classList.add('selected');
+      loadChronoReading(state.selectedDay);
+    }
+  }
+}
+
+function loadChronoReading(dayIndex) {
+  const reading = CHRONO_SCHEDULE[dayIndex % CHRONO_SCHEDULE.length];
+  currentReading = reading;
+
+  document.getElementById('readingDay').textContent = `Day ${reading.day}`;
+  document.getElementById('readingRef').textContent = reading.ref;
+  document.getElementById('readingTheme').textContent = reading.theme;
+  document.getElementById('readingDesc').textContent = reading.desc;
+
+  const jwUrl = `https://www.jw.org/finder?wtlocale=E&docid=${reading.docid}&par=1`;
+  document.getElementById('jwLink').href = jwUrl;
+
+  const bgRef = encodeURIComponent(reading.ref.replace('–', '-'));
+  document.getElementById('bibleGatewayLink').href = `https://www.biblegateway.com/passage/?search=${bgRef}&version=NWT`;
+
+  // Update books read
+  reading.books.forEach(b => {
+    if(!state.booksRead.includes(b)) state.booksRead.push(b);
+  });
+  renderStats();
+  saveState();
+}
+
+// ══════════════════════════════════════════════════
+//  THEMATIC
+// ══════════════════════════════════════════════════
+
+function buildThemeGrid() {
+  const grid = document.getElementById('themeGrid');
+  grid.innerHTML = '';
+  THEMATIC_TRACKS.forEach(track => {
+    const card = document.createElement('div');
+    card.className = 'theme-card' + (state.selectedTheme === track.id ? ' active-theme' : '');
+    card.innerHTML = `
+      <div class="theme-emoji">${track.emoji}</div>
+      <div class="theme-title">${track.title}</div>
+      <div class="theme-books">${track.books}</div>
+      <div class="theme-days">${track.days}</div>
+    `;
+    card.onclick = () => selectTheme(track.id);
+    grid.appendChild(card);
+  });
+}
+
+function selectTheme(id) {
+  state.selectedTheme = id;
+  state.themeDay = state.themeDay || 0;
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active-theme'));
+  event.currentTarget.classList.add('active-theme');
+
+  const track = THEMATIC_TRACKS.find(t => t.id === id);
+  const reading = track.readings[state.themeDay % track.readings.length];
+  currentReading = reading;
+
+  document.getElementById('themeDay').textContent = `Reading ${state.themeDay + 1} of ${track.readings.length}`;
+  document.getElementById('themeRef').textContent = reading.ref;
+  document.getElementById('themeSubtitle').textContent = reading.subtitle;
+  document.getElementById('themeDesc').textContent = reading.desc;
+
+  const jwUrl = `https://www.jw.org/finder?wtlocale=E&docid=${reading.docid}&par=${reading.par}`;
+  document.getElementById('themeJwLink').href = jwUrl;
+
+  document.getElementById('themeReadingCard').style.display = 'block';
+  saveState();
+}
+
+// ══════════════════════════════════════════════════
+//  WISDOM
+// ══════════════════════════════════════════════════
+
+function loadWisdomReading() {
+  const now = new Date();
+  const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+  const reading = WISDOM_SCHEDULE[dayOfYear % WISDOM_SCHEDULE.length];
+  currentReading = reading;
+
+  document.getElementById('wisdomRef').textContent = reading.ref;
+  document.getElementById('wisdomTheme').textContent = reading.theme;
+  document.getElementById('wisdomDesc').textContent = reading.desc;
+
+  const jwUrl = `https://www.jw.org/finder?wtlocale=E&docid=${reading.docid}&par=${reading.par}`;
+  document.getElementById('wisdomJwLink').href = jwUrl;
+}
+
+// ══════════════════════════════════════════════════
+//  MODE SWITCHING
+// ══════════════════════════════════════════════════
+
+function setMode(mode, silent) {
+  currentMode = mode;
+  state.mode = mode;
+
+  ['chrono','thematic','wisdom'].forEach(m => {
+    document.getElementById(m + '-panel').style.display = 'none';
+    document.getElementById('btn-' + (m === 'chrono' ? 'chrono' : m === 'thematic' ? 'thematic' : 'wisdom')).classList.remove('active');
+  });
+
+  document.getElementById(
+    mode === 'chronological' ? 'chrono-panel' :
+    mode === 'thematic' ? 'thematic-panel' : 'wisdom-panel'
+  ).style.display = 'block';
+
+  document.getElementById('btn-' + (mode === 'chronological' ? 'chrono' : mode)).classList.add('active');
+
+  if(mode === 'thematic') {
+    buildThemeGrid();
+    if(state.selectedTheme) selectThemeById(state.selectedTheme);
+  }
+  if(mode === 'wisdom') loadWisdomReading();
+
+  if(!silent) saveState();
+}
+
+function selectThemeById(id) {
+  const track = THEMATIC_TRACKS.find(t => t.id === id);
+  if(!track) return;
+  const reading = track.readings[state.themeDay % track.readings.length];
+  currentReading = reading;
+  document.getElementById('themeDay').textContent = `Reading ${state.themeDay + 1} of ${track.readings.length}`;
+  document.getElementById('themeRef').textContent = reading.ref;
+  document.getElementById('themeSubtitle').textContent = reading.subtitle;
+  document.getElementById('themeDesc').textContent = reading.desc;
+  document.getElementById('themeJwLink').href = `https://www.jw.org/finder?wtlocale=E&docid=${reading.docid}&par=${reading.par}`;
+  document.getElementById('themeReadingCard').style.display = 'block';
+}
+
+// ══════════════════════════════════════════════════
+//  STATS & PROGRESS
+// ══════════════════════════════════════════════════
+
+function renderStats() {
+  document.getElementById('streakVal').textContent = state.streak;
+  document.getElementById('completedVal').textContent = state.sessions;
+  document.getElementById('booksVal').textContent = state.booksRead.length;
+
+  const pct = Math.min(100, Math.round((state.sessions / 365) * 100));
+  document.getElementById('pctVal').textContent = pct + '%';
+  document.getElementById('progFill').style.width = pct + '%';
+
+  const booksArr = [...new Set(state.booksRead)];
+  document.getElementById('progressBooks').textContent =
+    booksArr.length > 0 ? booksArr.join(' · ') : 'No books read yet';
+}
+
+function checkMissedDays() {
+  if(!state.lastDate) return;
+  const last = new Date(state.lastDate);
+  const now = new Date();
+  const diff = Math.floor((now - last) / 86400000);
+  if(diff > 1 && diff < 30) {
+    const banner = document.getElementById('missedBanner');
+    const txt = document.getElementById('missedText');
+    banner.classList.add('show');
+    txt.innerHTML = `You missed <strong>${diff} day${diff > 1 ? 's' : ''}</strong>. No shame here — <strong>grace is the whole point.</strong> Pick up exactly where you left off.`;
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  COMPLETE SESSION
+// ══════════════════════════════════════════════════
+
+function completeSession() {
+  const todayKey = new Date().toDateString();
+  if(state.completedDays[todayKey]) {
+    showToast('Already completed today ✓');
+    return;
+  }
+
+  const now = new Date();
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  if(state.lastDate === yesterday.toDateString()) {
+    state.streak++;
+  } else if(state.lastDate !== todayKey) {
+    state.streak = 1;
+  }
+
+  state.sessions++;
+  state.lastDate = todayKey;
+  state.completedDays[todayKey] = true;
+
+  // Advance thematic day
+  if(currentMode === 'thematic' && state.selectedTheme) {
+    const track = THEMATIC_TRACKS.find(t => t.id === state.selectedTheme);
+    if(track) state.themeDay = (state.themeDay + 1) % track.readings.length;
+  }
+
+  saveState();
+  renderStats();
+  buildDayGrid();
+
+  const btn = document.getElementById('completeBtn');
+  btn.classList.add('done');
+  btn.textContent = '✓  Session Complete';
+
+  showToast('Session recorded — well done ✦');
+}
+
+// ══════════════════════════════════════════════════
+//  AI REFLECTION
+// ══════════════════════════════════════════════════
+
+function prefillQ(el) {
+  document.getElementById('aiQuestion').value = el.textContent;
+  document.getElementById('aiQuestion').focus();
+}
+
+async function askAI() {
+  const question = document.getElementById('aiQuestion').value.trim();
+  if(!question) { showToast('Enter a question first'); return; }
+
+  const ref = currentReading ? currentReading.ref : 'today\'s Bible passage';
+  const btn = document.getElementById('askBtn');
+  const thinking = document.getElementById('aiThinking');
+  const response = document.getElementById('aiResponse');
+
+  btn.disabled = true;
+  thinking.classList.add('show');
+  response.classList.remove('show');
+
+  const systemPrompt = `You are a thoughtful, reverent Bible study companion. You help readers understand scripture deeply — its historical context, spiritual meaning, and practical application. You draw from the original Hebrew and Greek when helpful. You are warm, intellectually honest, and spiritually enriching. Never preachy. Responses are 2–4 paragraphs, beautifully written, no bullet points.`;
+
+  const userPrompt = `The reader is studying ${ref}. Their question: "${question}"
+
+Please give a rich, reflective answer that illuminates this passage. Include historical context, the original language if relevant, and a personal application dimension.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system: systemPrompt,
+        messages:[{ role:'user', content: userPrompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(b => b.text || '').join('') || 'No response.';
+    response.textContent = text;
+    response.classList.add('show');
+  } catch(e) {
+    response.textContent = 'Could not reach the reflection service. Check your connection and try again.';
+    response.classList.add('show');
+  }
+
+  btn.disabled = false;
+  thinking.classList.remove('show');
+}
+
+// ══════════════════════════════════════════════════
+//  EXPORT
+// ══════════════════════════════════════════════════
+
+function buildExportText() {
+  const now = new Date();
+  const ref = currentReading ? currentReading.ref : '—';
+  const theme = currentReading ? (currentReading.theme || currentReading.subtitle || '') : '';
+
+  const fields = {
+    'Key Figures': document.getElementById('f-characters').value,
+    'What Happened & Why': document.getElementById('f-events').value,
+    'Deeper Meaning': document.getElementById('f-deeper').value,
+    'What Is Not Obvious': document.getElementById('f-hidden').value,
+    'Personal Notes': document.getElementById('f-notes').value,
+    'Application': document.getElementById('f-apply').value,
+  };
+
+  let text = `SACRED STUDY JOURNAL\n`;
+  text += `${'═'.repeat(40)}\n`;
+  text += `Date: ${now.toLocaleDateString('en-US', {weekday:'long',year:'numeric',month:'long',day:'numeric'})}\n`;
+  text += `Reading: ${ref}\n`;
+  if(theme) text += `Theme: ${theme}\n`;
+  text += `${'─'.repeat(40)}\n\n`;
+
+  Object.entries(fields).forEach(([label, value]) => {
+    if(value.trim()) {
+      text += `${label.toUpperCase()}\n${value.trim()}\n\n`;
+    }
+  });
+
+  const aiText = document.getElementById('aiResponse').textContent;
+  if(aiText && document.getElementById('aiResponse').classList.contains('show')) {
+    text += `AI REFLECTION\n${aiText}\n\n`;
+  }
+
+  text += `${'─'.repeat(40)}\n`;
+  text += `Streak: ${state.streak} days · Total Sessions: ${state.sessions}`;
+  return text;
+}
+
+function openExport() {
+  const text = buildExportText();
+  document.getElementById('exportPreview').textContent = text;
+  document.getElementById('exportModal').classList.add('show');
+}
+
+function closeExport() {
+  document.getElementById('exportModal').classList.remove('show');
+}
+
+async function copyExport() {
+  const text = buildExportText();
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast('Copied to clipboard ✦');
+  } catch(e) {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Copied ✦');
+  }
+  closeExport();
+}
+
+function downloadJournal() {
+  const text = buildExportText();
+  const now = new Date();
+  const filename = `sacred-study-${now.toISOString().slice(0,10)}.txt`;
+  const blob = new Blob([text], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  showToast('Journal downloaded ✦');
+  closeExport();
+}
+
+function downloadJournalHtml() {
+  const now = new Date();
+  const ref = currentReading ? currentReading.ref : '—';
+  const fields = {
+    'Key Figures': document.getElementById('f-characters').value,
+    'What Happened & Why': document.getElementById('f-events').value,
+    'Deeper Meaning': document.getElementById('f-deeper').value,
+    'What Is Not Obvious': document.getElementById('f-hidden').value,
+    'Personal Notes': document.getElementById('f-notes').value,
+    'Application': document.getElementById('f-apply').value,
+  };
+
+  let rows = '';
+  Object.entries(fields).forEach(([label, value]) => {
+    if(value.trim()) {
+      rows += `<div class="section"><h3>${label}</h3><p>${value.trim().replace(/\n/g,'<br>')}</p></div>`;
+    }
+  });
+
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>Sacred Study Journal — ${now.toLocaleDateString()}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=EB+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+body{font-family:'EB Garamond',Georgia,serif;background:#faf6ee;color:#2c1f0e;max-width:680px;margin:0 auto;padding:40px 28px;line-height:1.8;}
+h1{font-family:'Cinzel',serif;font-size:1.6rem;letter-spacing:0.08em;color:#8a6a28;border-bottom:1px solid rgba(138,106,40,0.3);padding-bottom:12px;margin-bottom:6px;}
+.meta{font-style:italic;color:#a08040;margin-bottom:32px;font-size:0.95rem;}
+.section{margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid rgba(138,106,40,0.15);}
+.section:last-child{border-bottom:none;}
+h3{font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.28em;color:#8a6a28;text-transform:uppercase;margin-bottom:10px;}
+p{font-size:1.1rem;}
+.footer{margin-top:40px;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.25em;color:rgba(138,106,40,0.5);text-transform:uppercase;text-align:center;}
+@media print{body{padding:20px;}}
+</style>
+</head><body>
+<h1>Sacred Study Journal</h1>
+<div class="meta">${now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})} &nbsp;·&nbsp; ${ref}</div>
+${rows}
+<div class="footer">Sacred Study · Streak ${state.streak} days · ${state.sessions} total sessions</div>
+</body></html>`;
+
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `sacred-study-journal-${now.toISOString().slice(0,10)}.html`;
+  a.click();
+  showToast('Journal page downloaded ✦');
+  closeExport();
+}
+
+// ══════════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════════
+
+function saveState() {
+  localStorage.setItem('sacredStudy_v2', JSON.stringify(state));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// Close modal on overlay click
+document.getElementById('exportModal').addEventListener('click', function(e) {
+  if(e.target === this) closeExport();
+});
+
+// ══════════════════════════════════════════════════
+init();
+</script>
+</body>
+</html>
